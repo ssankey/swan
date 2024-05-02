@@ -4,6 +4,7 @@ import Sidebar from './components/sidebar';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import Porfolio from './pages/Porfolio';
+import DrawChart from './pages/chart';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -24,6 +25,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/portfolio" element={<Porfolio />} />
+              <Route path="/chart" element={<DrawChart />} />
             </Routes>
           </div>
         </div>

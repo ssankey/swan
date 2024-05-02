@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import EquityChart from '../components/EquityChart';
 
 const Portfolio = () => {
+    const [returnsData, setReturnsData] = useState([]);
     return (
         <div className='bg-white p-5 md:p-10'>
             <h1 className='text-2xl'>Trailing Returns</h1>
@@ -52,12 +53,33 @@ const Portfolio = () => {
                             <td className="p-2">-2.8%</td>
                             <td className="p-2">-40.3</td>
                         </tr>
+
+                        <tbody>
+                            {returnsData.map((data, index) => (
+                                <tr key={index} className='border-b border-gray-200'>
+                                    <td className="p-2">{data.name || "Default Name"}</td>
+                                    <td className="p-2">{data.ytd}%</td>
+                                    <td className="p-2">{data.oneDay}%</td>
+                                    <td className="p-2">{data.oneWeek}%</td>
+                                    <td className="p-2">{data.oneMonth}%</td>
+                                    <td className="p-2">{data.threeMonths}%</td>
+                                    <td className="p-2">{data.sixMonths}%</td>
+                                    <td className="p-2">{data.oneYear}%</td>
+                                    <td className="p-2">{data.threeYears}%</td>
+                                    <td className="p-2 border-r-4">{"SI"}</td>
+                                    <td className="p-2">{data.dd}%</td>
+                                    <td className="p-2">{data.maxDD}%</td>
+                                </tr>
+                            ))}
+                        </tbody>
+
                     </tbody>
                 </table>
             </div>
             <p className='text-xs text-gray-400'>Note: Returns above 1 year are annualised</p>
             <h1 className='text-2xl mt-8'>Equity curve</h1>
-            <EquityChart />
+            <EquityChart setReturnsData={setReturnsData} />
+            {console.log(returnsData)}
         </div>
     );
 }

@@ -3,7 +3,7 @@ import * as XLSX from 'xlsx';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 
-const EquityChart = () => {
+const EquityChart = ({setReturnsData}) => {
   const [data, setData] = useState([]);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -36,9 +36,7 @@ const EquityChart = () => {
   useEffect(() => {
     if (startDate && endDate) {
       const filtered = data.filter(
-        item =>
-          new Date(item.x) >= new Date(startDate) &&
-          new Date(item.x) <= new Date(endDate)
+        item => new Date(item.x) >= new Date(startDate) && new Date(item.x) <= new Date(endDate)
       );
       setFilteredData(filtered);
     } else {
@@ -46,6 +44,29 @@ const EquityChart = () => {
     }
   }, [startDate, endDate, data]);
 
+  const calculateDrawdown = (navData) => {
+    let highWaterMark = navData.length > 0 ? navData[0].y : 0;
+    const drawdownValues = [];
+
+    console.log(navData)
+  
+    for (const { y } of navData) {
+      if (y !== undefined) {
+        highWaterMark = Math.max(highWaterMark, y);
+        // console.log(highWaterMark)
+        const drawdown = highWaterMark !== 0 ? (y - highWaterMark) / highWaterMark : 0; // Ensure no division by zero
+        
+        drawdownValues.push(drawdown*200);
+      } else {
+        drawdownValues.push(undefined); // Push undefined for missing data
+      }
+    }
+    return drawdownValues;
+  };
+  
+  const drawdownValues = calculateDrawdown(filteredData);
+  
+console.log(drawdownValues)
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -70,6 +91,8 @@ const EquityChart = () => {
           display: true,
           text: 'NAV (Rs)',
         },
+        suggestedMin: 0.0000021,  // Adjust this value based on the range of your drawdown data
+        suggestedMax: 0.91,
       },
     },
   };
@@ -85,12 +108,93 @@ const EquityChart = () => {
         borderColor: 'rgba(75,192,192,1)',
         pointRadius: 0,
       },
+      {
+        label: 'Drawdown',
+        data: drawdownValues.reverse(),
+        fill: false,
+        borderColor: 'rgba(255, 99, 132, 1)',
+        pointRadius: 0,
+        yAxisID: 'y'
+      },
     ],
   };
 
+
+  const calculatePeriodReturns = (navData) => {
+    const returns = {
+      ytd: null,
+      oneDay: null,
+      oneWeek: null,
+      oneMonth: null,
+      threeMonths: null,
+      sixMonths: null,
+      oneYear: null,
+      threeYears: null,
+    };
+  
+    const today = new Date();
+    const oneDay = 24 * 60 * 60 * 1000; // milliseconds in a day
+    const oneWeek = 7 * oneDay;
+    const oneMonth = 30 * oneDay;
+    const threeMonths = 90 * oneDay;
+    const sixMonths = 180 * oneDay;
+    const oneYear = 365 * oneDay;
+    const threeYears = 3 * oneYear;
+    const startIndexOfYear = navData.findIndex(item => new Date(item.x) >= new Date(today.getFullYear(), 0, 1));
+  
+    if (startIndexOfYear !== -1) {
+      returns.ytd = ((navData[navData.length - 1].y - navData[startIndexOfYear].y) / navData[startIndexOfYear].y) * 100;
+    }
+  
+    for (let i = navData.length - 1; i >= 0; i--) {
+      const currentDate = new Date(navData[i].x);
+      const oneDayAgo = new Date(currentDate.getTime() - oneDay);
+      const oneWeekAgo = new Date(currentDate.getTime() - oneWeek);
+      const oneMonthAgo = new Date(currentDate.getTime() - oneMonth);
+      const threeMonthsAgo = new Date(currentDate.getTime() - threeMonths);
+      const sixMonthsAgo = new Date(currentDate.getTime() - sixMonths);
+      const oneYearAgo = new Date(currentDate.getTime() - oneYear);
+      const threeYearsAgo = new Date(currentDate.getTime() - threeYears);
+  
+      if (i === navData.length - 1) {
+        const periods = [
+          { ago: oneDayAgo, key: 'oneDay' },
+          { ago: oneWeekAgo, key: 'oneWeek' },
+          { ago: oneMonthAgo, key: 'oneMonth' },
+          { ago: threeMonthsAgo, key: 'threeMonths' },
+          { ago: sixMonthsAgo, key: 'sixMonths' },
+          { ago: oneYearAgo, key: 'oneYear' },
+          { ago: threeYearsAgo, key: 'threeYears' },
+        ];
+  
+        periods.forEach(period => {
+          const index = navData.findIndex(item => new Date(item.x) <= period.ago);
+          if (index !== -1) {
+            returns[period.key] = ((navData[navData.length - 1].y - navData[index].y) / navData[index].y) * 100;
+          }
+        });
+      }
+    }
+
+    
+  
+    return returns;
+  };
+  
+  useEffect(() => {
+    const newReturnsData = calculatePeriodReturns(filteredData);  // This should return an array
+    if (Array.isArray(newReturnsData)) {  // Check if it's an array
+        setReturnsData(newReturnsData);
+    } else {
+        console.error('Expected an array from calculateReturns, received:', newReturnsData);
+    }
+}, [filteredData]);  // Dependency on filteredData only
+
+
+
   return (
     <div className="mt-4 chart-container">
-      <div className="flex flex-col md:flex-row  md:justify-between items-center md:items-start">
+      <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start">
         <p className="text-xs">Live since 2019-05-25</p>
         <div className="flex flex-col md:flex-row items-start">
           <div>
