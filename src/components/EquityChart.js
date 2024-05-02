@@ -53,12 +53,11 @@ const EquityChart = ({setReturnsData}) => {
     for (const { y } of navData) {
       if (y !== undefined) {
         highWaterMark = Math.max(highWaterMark, y);
-        // console.log(highWaterMark)
-        const drawdown = highWaterMark !== 0 ? (y - highWaterMark) / highWaterMark : 0; // Ensure no division by zero
+        const drawdown = highWaterMark !== 0 ? (y - highWaterMark) / highWaterMark : 0; 
         
         drawdownValues.push(drawdown*200);
       } else {
-        drawdownValues.push(undefined); // Push undefined for missing data
+        drawdownValues.push(undefined);
       }
     }
     return drawdownValues;
@@ -85,14 +84,16 @@ console.log(drawdownValues)
           display: true,
           text: 'Date',
         },
+        grid: {
+          color: "rgba(0, 0, 0, 0)",
+      }
       },
       y: {
         title: {
           display: true,
           text: 'NAV (Rs)',
         },
-        suggestedMin: 0.0000021,  // Adjust this value based on the range of your drawdown data
-        suggestedMax: 0.91,
+
       },
     },
   };
@@ -133,7 +134,7 @@ console.log(drawdownValues)
     };
   
     const today = new Date();
-    const oneDay = 24 * 60 * 60 * 1000; // milliseconds in a day
+    const oneDay = 24 * 60 * 60 * 1000;
     const oneWeek = 7 * oneDay;
     const oneMonth = 30 * oneDay;
     const threeMonths = 90 * oneDay;
@@ -182,13 +183,13 @@ console.log(drawdownValues)
   };
   
   useEffect(() => {
-    const newReturnsData = calculatePeriodReturns(filteredData);  // This should return an array
-    if (Array.isArray(newReturnsData)) {  // Check if it's an array
+    const newReturnsData = calculatePeriodReturns(filteredData); 
+    if (Array.isArray(newReturnsData)) {
         setReturnsData(newReturnsData);
     } else {
         console.error('Expected an array from calculateReturns, received:', newReturnsData);
     }
-}, [filteredData]);  // Dependency on filteredData only
+}, [filteredData]); 
 
 
 
