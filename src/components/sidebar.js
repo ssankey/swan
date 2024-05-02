@@ -12,7 +12,9 @@ const Sidebar = ({ isOpen }) => {
     }
 
     return (
-        <div className={`transform top-0 flex justify-between flex-col left-0 w-64 bg-white text-gray-600 fixed h-full overflow-auto ease-in-out transition-all duration-300 z-30 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
+        <div className={`fixed z-40 top-0 left-0 h-screen p-4 bg-white shadow-lg transition-transform duration-300 ${
+            isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`} >
                 <div>
                     <div className='m-3'>
                         <a aria-label="Capitalmind Header Logo" href="/">

@@ -4,25 +4,35 @@ import Sidebar from './components/sidebar';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import Porfolio from './pages/Porfolio';
-import Chart from './pages/chart';
+
 function App() {
-  const [isOpen, setIsOpen] = useState(true);
-  const toggleSidebar = () => setIsOpen(!isOpen);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
     <BrowserRouter>
-      <div className="flex">
-        <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
-        <div className={`flex-1 transition-all duration-300 ${isOpen ? 'pl-64' : 'pl-0'}`}>
-          <button onClick={toggleSidebar} className="text-3xl m-2 cursor-pointer">&#9776;</button>
-          <div className='px-16'>
+      <div className="relative">
+        <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+        <div className="flex flex-col min-h-screen">
+          <div className="flex items-center justify-between bg-gray-100 py-2 px-4">
+            <button onClick={toggleSidebar} className="text-3xl cursor-pointer">
+              &#9776;
+            </button>
+          </div>
+          <div className="flex-1 p-4">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/portfolio" element={<Porfolio />} />
-              <Route path="/chart" element={<Chart />} />
             </Routes>
           </div>
         </div>
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black opacity-50"
+            onClick={toggleSidebar}
+          ></div>
+        )}
       </div>
     </BrowserRouter>
   );
