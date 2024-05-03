@@ -131,7 +131,12 @@ const Portfolio = () => {
             oneYear: null,
             threeYears: null,
         };
-    
+
+
+        if(navData.length===0){
+       setReturns(returns);
+            return;
+        }
         const today = new Date();
         const oneDay = 24 * 60 * 60 * 1000; // milliseconds in one day
     
