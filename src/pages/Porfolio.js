@@ -165,11 +165,12 @@ const Portfolio = () => {
         ];
     
         periods.forEach(period => {
-            const index = navData.findIndex(item => new Date(item.x).toDateString() <= period.ago.toDateString());
-            if (index !== -1) {
-                returns[period.key] = ((navData[navData.length - 1].y - navData[index].y) / navData[index].y) * 100;
-            }
-        });
+    const index = navData.findIndex(item => item.x && new Date(item.x).toDateString() <= period.ago.toDateString());
+
+    if (index !== -1) {
+        returns[period.key] = ((navData[navData.length - 1].y - navData[index].y) / navData[index].y) * 100;
+    }
+});
     
         setReturns(returns);
     };
